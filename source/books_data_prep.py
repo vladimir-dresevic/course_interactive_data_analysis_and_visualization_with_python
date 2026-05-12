@@ -1,6 +1,12 @@
 import pandas as pd
 
 
+def standardize_column_names(df: pd.DataFrame) -> pd.DataFrame:
+    df.columns = [col.lower().replace(' ', '_').replace('-', '_')
+                  for col in df.columns]
+    return df
+
+
 def convert_to_numeric(df: pd.DataFrame) -> pd.DataFrame:
     df[['times_borrowed', 'page_count']] = df[[
         'times_borrowed', 'page_count']].astype('Int16')
@@ -106,7 +112,8 @@ def remove_na(df: pd.DataFrame) -> pd.DataFrame:
 
     df['title'] = df['title'].fillna("Unknown title")
     df['author'] = df['author'].fillna("Unknown author")
-    df['genre'] = df['genre'].astype(object).fillna("Unknown genre").astype('category')
+    df['genre'] = df['genre'].astype(object).fillna(
+        "Unknown genre").astype('category')
     return df
 
 
@@ -131,7 +138,6 @@ def standardize_languages(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-
 def standardize_sections(df: pd.DataFrame) -> pd.DataFrame:
 
     mapping = {
@@ -139,22 +145,20 @@ def standardize_sections(df: pd.DataFrame) -> pd.DataFrame:
         "Children's": "Children",
         "Children's Fiction": "Children"
     }
-    
+
     df['section'] = df['section'].astype(
         object).replace(mapping).astype("category")
 
     return df
 
 
-
-
 def standardize_authors(df: pd.DataFrame) -> pd.DataFrame:
 
     mapping = {
-    'Lev Tolstoy': 'Leo Tolstoy',
-    'Winston S. Churchill': 'Winston Churchill',
-    'Plato': 'Platon',
-    'Will Shakespeare': 'William Shakespeare'
+        'Lev Tolstoy': 'Leo Tolstoy',
+        'Winston S. Churchill': 'Winston Churchill',
+        'Plato': 'Platon',
+        'Will Shakespeare': 'William Shakespeare'
     }
 
     df['author'] = df['author'].replace(mapping)
@@ -164,28 +168,32 @@ def standardize_authors(df: pd.DataFrame) -> pd.DataFrame:
 def standardize_genres(df: pd.DataFrame) -> pd.DataFrame:
 
     mapping = {
-    'Classic': 'Classics',
-    'Classic Literature': 'Classics',
-    'Novel': 'Novels',
-    "Religion, Spirituality": "Religion & Spirituality",
-    "Spirituality": "Religion & Spirituality",
-    "Historical": "History",
-    "Religious Fiction": "Religion & Spirituality",
-    "Religion": "Religion & Spirituality",
-    "Utopian Fiction": "Utopian",
-    "Utopian Literature": "Utopian",
-    "Natural History": "History",
-    "Children's Stories": "Children's Fiction",
-    "Children's Literature": "Children's Fiction",
-    "Music/Songbooks": "Music",
-    "Epic Poetry": "Poetry"
+        'Classic': 'Classics',
+        'Classic Literature': 'Classics',
+        'Novel': 'Novels',
+        "Religion, Spirituality": "Religion & Spirituality",
+        "Spirituality": "Religion & Spirituality",
+        "Historical": "History",
+        "Religious Fiction": "Religion & Spirituality",
+        "Religion": "Religion & Spirituality",
+        "Utopian Fiction": "Utopian",
+        "Utopian Literature": "Utopian",
+        "Natural History": "History",
+        "Children's Stories": "Children's Fiction",
+        "Children's Literature": "Children's Fiction",
+        "Music/Songbooks": "Music",
+        "Epic Poetry": "Poetry"
     }
 
-    df['genre'] = df['genre'].astype(object).replace(mapping).astype('category')
+    df['genre'] = df['genre'].astype(
+        object).replace(mapping).astype('category')
 
     return df
 
 
+def remove_future_books(df: pd.DataFrame) -> pd.DataFrame:
+    return df[df['year_published'] <= pd.Timestamp.today().year]
+
 
 def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
-    return df.pipe(convert_to_numeric).pipe(convert_to_datetime).pipe(convert_to_category).pipe(parse_ratings).pipe(parse_ratings_count).pipe(parse_prices).pipe(split_dimensions_to_separate_columns).pipe(split_catalog_position_to_separate_columns).pipe(remove_na).pipe(remove_duplicates).pipe(standardize_languages).pipe(standardize_sections).pipe(standardize_authors).pipe(standardize_genres)
+    return df.pipe(standardize_column_names).pipe(convert_to_numeric).pipe(convert_to_datetime).pipe(convert_to_category).pipe(parse_ratings).pipe(parse_ratings_count).pipe(parse_prices).pipe(split_dimensions_to_separate_columns).pipe(split_catalog_position_to_separate_columns).pipe(remove_na).pipe(remove_duplicates).pipe(standardize_languages).pipe(standardize_sections).pipe(standardize_authors).pipe(standardize_genres).pipe(remove_future_books)
