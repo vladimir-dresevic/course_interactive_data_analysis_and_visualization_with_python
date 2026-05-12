@@ -172,7 +172,7 @@ This progression reflects the intended structure of the course and helps learner
 
 ## Version
 
-**Latest course version:** April 2025
+**Latest course version:** April 2026
 
 ## Final Note
 
